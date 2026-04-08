@@ -54,7 +54,7 @@ public class Book
 
     #region Methods
 
-    public void CheckAvailability()
+    public (bool, LibraryAsset) CheckAvailability()
     {
         // TODO: Implement Logic
         // make sure the return type is (bool, LibraryAsset)
@@ -67,7 +67,7 @@ public class Book
         Debug.Assert(false, "Logic not implemented");
     }
 
-    public void ReturnBook(int libID)
+    public (TimeSpan, int, decimal) ReturnBook(int libID)
     {
         // TODO: Implement Logic
         // make sure the return type is (TimeSpan, int, decimal)
