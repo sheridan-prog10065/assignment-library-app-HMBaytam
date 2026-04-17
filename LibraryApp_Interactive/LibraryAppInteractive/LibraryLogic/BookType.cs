@@ -1,4 +1,4 @@
-namespace LibraryAppInteractive;
+namespace LibraryLogic;
 
 public enum BookType
 {

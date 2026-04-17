@@ -1,4 +1,4 @@
-namespace LibraryAppInteractive;
+namespace LibraryLogic;
 
 public struct LoanPeriod
 {
@@ -33,6 +33,12 @@ public struct LoanPeriod
         get { return _returnedOn; }
         set { _returnedOn = value; }
     }
-    
+
+    public DateTime DueDate
+    {
+        get { return _dueDate; }
+        set { _dueDate = value; }
+    }
+
     #endregion
 }

@@ -1,21 +1,30 @@
-using System.Diagnostics;
+using System.Collections.ObjectModel;
 
-namespace LibraryAppInteractive;
+namespace LibraryLogic;
 
 /// <summary>
 /// Defines the Library class used to manage the library books and assets.
 ///
 /// NOTE: A single object/instance of this class (called a "singleton") is created and shared automatically
 /// with the two pages in the application through the process of Dependency Injection handled and configured
-/// in MauiProgram class.  
+/// in MauiProgram class.
 /// </summary>
 public class Library
 {
     #region Feilds
 
-    private List<Book> _booklist;
+    private ObservableCollection<Book> _booklist;
     private int _libDGeneratorSeed;
     private const int DEFAULT_LIBD_START = 100;
+
+    #endregion
+
+    #region Properties
+
+    public ObservableCollection<Book> Books
+    {
+        get { return _booklist; }
+    }
 
     #endregion
 
@@ -23,8 +32,9 @@ public class Library
 
     public Library()
     {
-        // TODO: Implement Logic
-        Debug.Assert(false, "Logic not implemented");
+        _booklist = new ObservableCollection<Book>();
+        _libDGeneratorSeed = DEFAULT_LIBD_START;
+        CreateDefaultBooks();
     }
 
     #endregion
@@ -33,37 +43,52 @@ public class Library
 
     private void CreateDefaultBooks()
     {
-        // TODO: Implement Logic
-        Debug.Assert(false, "Logic not implemented");
+        RegisterBook("The Great Gatsby", "978-0743273565", new List<string> { "F. Scott Fitzgerald" }, BookType.Paper, 2);
+        RegisterBook("Clean Code", "978-0132350884", new List<string> { "Robert C. Martin" }, BookType.Paper, 2);
+        RegisterBook("Dune", "978-0441013593", new List<string> { "Frank Herbert" }, BookType.Paper, 2);
     }
 
     private int DetermineLibID()
     {
-        // TODO: Implement Logic
-        Debug.Assert(false, "Logic not implemented");
-        return 1;
+        return ++_libDGeneratorSeed;
     }
 
     public Book RegisterBook(string bookName, string bookISBN, List<string> authors, BookType bookType, int nCopies)
     {
-        // TODO: Implement Logic
-        Debug.Assert(false, "Logic not implemented");
-        return new Book(bookName, bookISBN);
+        Book book = new Book(bookName, bookISBN);
+        book.Authors = authors;
+
+        List<LibraryAsset> assets = new List<LibraryAsset>();
+        for (int i = 0; i < nCopies; i++)
+        {
+            LibraryAsset asset = new LibraryAsset(DetermineLibID(), book);
+            assets.Add(asset);
+        }
+        book.Assets = assets;
+
+        _booklist.Add(book);
+        return book;
     }
-    
+
     public Book FindBookByName(string bookName)
     {
-        // TODO: Implement Logic
-        Debug.Assert(false, "Logic not implemented");
+        foreach (Book book in _booklist)
+        {
+            if (string.Equals(book.Name, bookName, StringComparison.OrdinalIgnoreCase))
+                return book;
+        }
+        return null;
     }
 
     public Book FindBookByISBN(string bookISBN)
     {
-        // TODO: Implement Logic
-        Debug.Assert(false, "Logic not implemented");
+        foreach (Book book in _booklist)
+        {
+            if (book.ISBN == bookISBN)
+                return book;
+        }
+        return null;
     }
     
     #endregion
-
-   
 }

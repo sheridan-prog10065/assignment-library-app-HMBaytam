@@ -1,4 +1,4 @@
-namespace LibraryAppInteractive;
+namespace LibraryLogic;
 
 public class LibraryAsset
 {
@@ -17,6 +17,7 @@ public class LibraryAsset
     {
         _libID = libID;
         _book = book;
+        _status = AssetStatus.Available;
     }
 
     #endregion
@@ -39,6 +40,12 @@ public class LibraryAsset
     {
         get { return _loanPeriod; }
         set { _loanPeriod = value; }
+    }
+
+    public Book Book
+    {
+        get { return _book; }
+        set { _book = value; }
     }
 
     #endregion

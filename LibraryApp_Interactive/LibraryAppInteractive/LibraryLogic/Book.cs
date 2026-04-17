@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace LibraryAppInteractive;
+namespace LibraryLogic;
 
 public class Book
 {
@@ -14,13 +14,15 @@ public class Book
     #endregion
 
     #region Constructors
-    
+
     public Book(string bookName, string bookISBN)
     {
         _bookName = bookName;
         _bookISBN = bookISBN;
+        _bookAuthorList = new List<string>();
+        _libAssetList = new List<LibraryAsset>();
     }
-    
+
     #endregion
 
     #region Properties
@@ -30,7 +32,7 @@ public class Book
         get { return _bookName; }
         set { _bookName = value; }
     }
-    
+
 
     public string ISBN
     {
@@ -50,46 +52,99 @@ public class Book
         set { _libAssetList = value; }
     }
 
+    public int AvailableCopies
+    {
+        get
+        {
+            int count = 0;
+            foreach (LibraryAsset asset in _libAssetList)
+            {
+                if (asset.Status == AssetStatus.Available)
+                    count++;
+            }
+            return count;
+        }
+    }
+
     #endregion
 
     #region Methods
 
     public (bool, LibraryAsset) CheckAvailability()
     {
-        // TODO: Implement Logic
-        // make sure the return type is (bool, LibraryAsset)
-        Debug.Assert(false, "Logic not implemented");
+        LibraryAsset asset = findNextAvailableAsset();
+        if (asset != null)
+            return (true, asset);
+        return (false, null);
     }
 
     public LibraryAsset BorrowBook()
     {
-        // TODO: Implement Logic
-        Debug.Assert(false, "Logic not implemented");
+        LibraryAsset asset = findNextAvailableAsset();
+        if (asset == null)
+            return null;
+
+        asset.Status = AssetStatus.Loaned;
+        LoanPeriod loan = new LoanPeriod(DateTime.Now, DateTime.MinValue);
+        loan.DueDate = DateTime.Now.AddDays(14);
+        asset.Loan = loan;
+        return asset;
     }
 
     public (TimeSpan, int, decimal) ReturnBook(int libID)
     {
-        // TODO: Implement Logic
-        // make sure the return type is (TimeSpan, int, decimal)
-        Debug.Assert(false, "Logic not implemented");
+        LibraryAsset asset = findLibraryAsser(libID);
+
+        LoanPeriod loan = asset.Loan;
+        loan.ReturnedOn = DateTime.Now;
+        asset.Loan = loan;
+        asset.Status = AssetStatus.Available;
+
+        TimeSpan timeSpan = loan.ReturnedOn - loan.BorrowedOn;
+
+        decimal fine = 0m;
+        if (loan.ReturnedOn > loan.DueDate)
+        {
+            int daysOverdue = (int)(loan.ReturnedOn - loan.DueDate).TotalDays;
+            fine = daysOverdue * 0.25m;
+        }
+
+        return (timeSpan, libID, fine);
     }
+
     public LibraryAsset ReserveBook()
     {
-        // TODO: Implement Logic
-        Debug.Assert(false, "Logic not implemented");
+        LibraryAsset asset = findNextAvailableAsset();
+        if (asset == null)
+            return null;
+
+        asset.Status = AssetStatus.Reserved;
+        return asset;
     }
 
     private LibraryAsset findLibraryAsser(int libID)
     {
-        // TODO: Implement Logic
-        Debug.Assert(false, "Logic not implemented");
+        foreach (LibraryAsset asset in _libAssetList)
+        {
+            if (asset.LibID == libID)
+                return asset;
+        }
+        return null;
     }
 
     private LibraryAsset findNextAvailableAsset()
     {
-        // TODO: Implement Logic
-        Debug.Assert(false, "Logic not implemented");
+        foreach (LibraryAsset asset in _libAssetList)
+        {
+            if (asset.Status == AssetStatus.Available)
+                return asset;
+        }
+        return null;
     }
-
+    
+    public override string ToString()
+    {
+        return $"{_bookName}, ISBN:{_bookISBN}";
+    }
     #endregion
 }
