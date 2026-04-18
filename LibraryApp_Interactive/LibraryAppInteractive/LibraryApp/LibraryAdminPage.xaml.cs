@@ -27,6 +27,12 @@ public partial class LibraryAdminPage : ContentPage
             return;
         }
 
+        if (_library.FindBookByISBN(isbn) != null)
+        {
+            await DisplayAlert("Duplicate ISBN", $"A book with ISBN '{isbn}' already exists.", "OK");
+            return;
+        }
+
         BookType bookType = (BookType)(bookTypeIndex + 1);
         List<string> authors = new List<string>();
         foreach (string author in authorsRaw.Split(','))
