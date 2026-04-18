@@ -1,3 +1,4 @@
+using System.Linq;
 using LibraryLogic;
 
 namespace LibraryAppInteractive;
@@ -10,12 +11,12 @@ public partial class LibraryBrowsePage : ContentPage
     {
         _library = library;
         InitializeComponent();
-        _lstVehicleInventory.ItemsSource = library.Books;
+        _lstBookInventory.ItemsSource = library.Books;
     }
 
     private async void OnBorrowBook(object sender, EventArgs e)
     {
-        Book selectedBook = _lstVehicleInventory.SelectedItem as Book;
+        Book selectedBook = _lstBookInventory.SelectedItem as Book;
         if (selectedBook == null)
         {
             await DisplayAlert("No Selection", "Please select a book to borrow.", "OK");
@@ -53,6 +54,26 @@ public partial class LibraryBrowsePage : ContentPage
         await DisplayAlert("Returned", message, "OK");
 
         RefreshLoansList();
+    }
+
+    private void OnSearchClicked(object sender, EventArgs e)
+    {
+        string query = _searchEntry.Text?.Trim() ?? string.Empty;
+
+        if (string.IsNullOrEmpty(query))
+        {
+            _lstBookInventory.ItemsSource = _library.Books;
+        }
+        else
+        {
+            var results = _library.Books
+                .Where(b =>
+                    b.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                    b.ISBN.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            _lstBookInventory.ItemsSource = results;
+        }
     }
 
     private void RefreshLoansList()
