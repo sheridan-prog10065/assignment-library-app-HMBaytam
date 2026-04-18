@@ -2,4 +2,5 @@
   <Project Path="LibraryApp/LibraryApp.csproj">
     <Deploy />
   </Project>
+  <Project Path="LibraryLogic/LibraryLogic.csproj" />
 </Solution>

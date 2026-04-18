@@ -1,9 +1,93 @@
-﻿namespace LibraryAppInteractive;
+using System.Linq;
+using LibraryLogic;
+
+namespace LibraryAppInteractive;
 
 public partial class LibraryBrowsePage : ContentPage
 {
-    public LibraryBrowsePage()
-    {   
+    private Library _library;
+
+    public LibraryBrowsePage(Library library)
+    {
+        _library = library;
         InitializeComponent();
+        _lstBookInventory.ItemsSource = library.Books;
+    }
+
+    private async void OnBorrowBook(object sender, EventArgs e)
+    {
+        Book selectedBook = _lstBookInventory.SelectedItem as Book;
+        if (selectedBook == null)
+        {
+            await DisplayAlert("No Selection", "Please select a book to borrow.", "OK");
+            return;
+        }
+
+        LibraryAsset asset = selectedBook.BorrowBook();
+        if (asset == null)
+        {
+            await DisplayAlert("Unavailable", $"\"{selectedBook.Name}\" has no available copies.", "OK");
+            return;
+        }
+
+        await DisplayAlert("Borrowed", $"\"{selectedBook.Name}\" borrowed! Due back by {asset.Loan.DueDate:d}.", "OK");
+
+        RefreshLoansList();
+    }
+
+    private async void OnReturnBook(object sender, EventArgs e)
+    {
+        LibraryAsset selectedAsset = _lstBooks.SelectedItem as LibraryAsset;
+        if (selectedAsset == null)
+        {
+            await DisplayAlert("No Selection", "Please select a loaned book to return.", "OK");
+            return;
+        }
+
+        Book book = selectedAsset.Book;
+        (TimeSpan duration, int libID, decimal fine) = book.ReturnBook(selectedAsset.LibID);
+
+        string message = $"\"{book.Name}\" returned after {(int)duration.TotalDays} day(s).";
+        if (fine > 0)
+            message += $"\nLate fine: ${fine:F2}";
+
+        await DisplayAlert("Returned", message, "OK");
+
+        RefreshLoansList();
+    }
+
+    private void OnSearchClicked(object sender, EventArgs e)
+    {
+        string query = _searchEntry.Text?.Trim() ?? string.Empty;
+
+        if (string.IsNullOrEmpty(query))
+        {
+            _lstBookInventory.ItemsSource = _library.Books;
+        }
+        else
+        {
+            var results = _library.Books
+                .Where(b =>
+                    b.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                    b.ISBN.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            _lstBookInventory.ItemsSource = results;
+        }
+    }
+
+    private void RefreshLoansList()
+    {
+        List<LibraryAsset> loanedAssets = new List<LibraryAsset>();
+        foreach (Book book in _library.Books)
+        {
+            foreach (LibraryAsset asset in book.Assets)
+            {
+                if (asset.Status == AssetStatus.Loaned)
+                    loanedAssets.Add(asset);
+            }
+        }
+        _lstBooks.ItemsSource = null;
+        _lstBooks.ItemsSource = loanedAssets;
     }
 }

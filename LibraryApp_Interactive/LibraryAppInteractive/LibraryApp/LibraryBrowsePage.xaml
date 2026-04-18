@@ -4,7 +4,83 @@
              x:Class="LibraryAppInteractive.LibraryBrowsePage"
              Title="Browse Interactive Library">
 			 
-	<Label Text="Browse Library page for the Interactive Library App"
-	       HorizontalOptions="Center"
-	       VerticalOptions="Center"/> 
+	<Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, *, Auto, Auto, *, Auto" ColumnDefinitions="*,*"
+	      Margin="{OnPlatform Default='20, 0, 20, 80', 
+                              iOS='20, 0, 20, 100', 
+                              Android='20, 0, 20, 20'}"
+	      RowSpacing="10" ColumnSpacing="10">
+		<Label Text="Search for book" FontSize="24" 
+		       Margin="0, 20, 0, 0"
+		       Grid.Row="0" Grid.ColumnSpan="2" />
+		<Label Text="Rental Period" FontSize="24" 
+		       Margin="0, 20, 0, 0"
+		       Grid.Row="2" Grid.ColumnSpan="2" />
+		<Label Text="Start:" VerticalOptions="Start"
+		       Grid.Row="3" />
+		<DatePicker x:Name="_dpStartDate"
+		            Format="d" HorizontalOptions="Fill"
+		            Grid.Row="4" Grid.Column="0" />
+
+		<Label Text="End:" VerticalOptions="Start"
+		       Grid.Row="3" Grid.Column="1" />
+		<DatePicker x:Name="_dpEndDate"
+		            Format="d" HorizontalOptions="Fill"
+		            Grid.Row="4" Grid.Column="1" />
+        
+		<!-- Search UI -->
+		<StackLayout Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8" Padding="0,4">
+			<Entry x:Name="_searchEntry"
+			       Placeholder="Search by title or ISBN..."
+			       HorizontalOptions="FillAndExpand" />
+			<Button Text="Search"
+			        Clicked="OnSearchClicked"
+			        WidthRequest="90" />
+		</StackLayout>
+
+		<!-- Book Selection UI-->
+		<Label Text="Book Selection" FontSize="24"
+		       Margin="0, 20, 0, 0"
+		       Grid.Row="5" Grid.ColumnSpan="2" />
+
+		<Border Grid.Row="6" Grid.ColumnSpan="2">
+			<CollectionView x:Name="_lstBookInventory" HorizontalOptions="Fill"
+			                SelectionMode="Single"/>
+		</Border>
+		<Button Text="Create Rental" HeightRequest="40"
+		        HorizontalOptions="Fill" Margin="0, 20, 0, 0"
+		        Grid.Row="7" Grid.ColumnSpan="2" 
+		        Clicked="OnBorrowBook"/>
+		
+		<!-- Rental List UI -->
+		<Label Text="Rentals" FontSize="24" 
+		       Margin="0, 20, 0, 0"
+		       Grid.Row="8" Grid.ColumnSpan="2" />
+
+		<Border Grid.Row="9" Grid.ColumnSpan="2">
+			<CollectionView x:Name="_lstBooks" HorizontalOptions="Fill"
+			                SelectionMode="Single">
+				<CollectionView.ItemTemplate>
+					<DataTemplate>
+						<Grid Padding="8,6" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+							<Label Text="{Binding Book.Name}" FontAttributes="Bold"
+							       Grid.Row="0" Grid.Column="0" />
+							<Label Text="{Binding Book.ISBN}" TextColor="Gray"
+							       Grid.Row="0" Grid.Column="1" />
+							<Label Text="{Binding Loan.BorrowedOn, StringFormat='Start: {0:d}'}"
+							       Grid.Row="1" Grid.Column="0" />
+							<Label Text="{Binding Loan.DueDate, StringFormat='Return: {0:d}'}"
+							       Grid.Row="1" Grid.Column="1" />
+						</Grid>
+					</DataTemplate>
+				</CollectionView.ItemTemplate>
+			</CollectionView>
+		</Border>
+		<Button Text="Return Rental" HeightRequest="40"
+		        HorizontalOptions="Fill" Margin="0, 20, 0, 0"
+		        Grid.Row="10" Grid.ColumnSpan="2" 
+		        Clicked="OnReturnBook"/>
+
+		
+
+	</Grid>
 </ContentPage>

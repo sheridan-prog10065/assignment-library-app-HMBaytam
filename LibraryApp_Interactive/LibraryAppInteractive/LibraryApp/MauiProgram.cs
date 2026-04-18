@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using LibraryLogic;
 
 namespace LibraryAppInteractive;
 
@@ -14,7 +14,11 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
-        
+
+        builder.Services.AddSingleton<Library>();
+        builder.Services.AddTransient<LibraryAdminPage>();
+        builder.Services.AddTransient<LibraryBrowsePage>();
+
         return builder.Build();
     }
 }
